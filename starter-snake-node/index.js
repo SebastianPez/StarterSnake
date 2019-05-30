@@ -78,7 +78,7 @@ app.post('/move', (request, response) => {
   };
 
   let data = {
-    move: 'down', // one of: ['up','down','left','right']
+    move: 'right', // one of: ['up','down','left','right']
   }
   
   if (myHeadY === 14) {
@@ -109,12 +109,12 @@ app.post('/move', (request, response) => {
   
   checkForFood();
 
-  // if (foodY.above) {
-  //   console.log(foodY);
-  //   console.log("============");
-  //   data.move = 'up';
-  //   foodY.above = false;
-  // }
+  if (foodY.above) {
+    console.log(foodY);
+    console.log("============");
+    data.move = 'up';
+    foodY.above = false;
+  }
 
   if (foodY.below) {
     console.log(foodY);
@@ -123,17 +123,20 @@ app.post('/move', (request, response) => {
     foodY.below = false;
   }
 
+  if (myBody)
 
 
-  console.log("Snake head: ", myBody[0]);
+
+  // console.log("Snake head: ", myBody[0]);
+  // console.log("============");
+  // console.log(data.move);
+  // console.log("============");
+  // console.log("Turn #: ", request.body.turn);
   console.log("============");
-  console.log(data.move);
-  console.log("============");
-  console.log("Turn #: ", request.body.turn);
-  console.log("============");
-  // console.log(myBody);
+  console.log(myBody);
   // console.log(request.body);
-  console.log(foodArray);
+  console.log("============");
+  // console.log(foodArray);
 
 
   // Response data
