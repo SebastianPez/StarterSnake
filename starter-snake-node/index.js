@@ -195,27 +195,29 @@ app.post('/move', (request, response) => {
     }
   }
 
-  // function bodyBetweenFood(head, axisOne, axisTwo, foodObject) {
-  //   for (let i = 1; i < myBody.length; i ++) {
-  //     if (head[axisOne] === foodObject[i][axisOne] && head[axisOne])
-  //   }
-
-  // }
 
   function bodyBetweenFood() {
     for (let i = 1; i < myBody.length; i ++) {
-      if (myHeadX === myBody[i].x && myHeadY > myBody[i].y) {
+      let headDistanceFood = {
+        x: Math.abs(myHeadX - foodX.coords.x),
+        y: Math.abs(myHeadY - foodY.coords.y)
+      };
+      let headDistanceBody = {
+        x: Math.abs(myBody[i].x - foodX.coords.x),
+        y: Math.abs(myBody[i].y - foodY.coords.y)
+      };
+      if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
         blocked.up = true;
-      }
-      if (myHeadX === myBody[i].x && myHeadY < myBody[i].y) {
         blocked.down = true;
       }
-      if (myHeadY === myBody[i].y && myHeadX > myBody[i].x) {
+      // if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
+      // }
+      if (myHeadY === myBody[i].y && headDistanceFood.x > headDistanceBody.x) {
         blocked.left = true;
-      }
-      if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
         blocked.right = true;
       }
+      // if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
+      // }
     }
   }
 
