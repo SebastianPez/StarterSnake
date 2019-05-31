@@ -73,14 +73,28 @@ app.post('/move', (request, response) => {
   const myBody = request.body.you.body;
   let myHeadY = myBody[0].y;
   let myHeadX = myBody[0].x;
+  let blocked = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  };
   // Array of food objects on the board.
   const foodArray = request.body.board.food;
   let foodY = {
+    coords: {
+      x: 0,
+      y: 0
+    },
     above: false,
     below: false
   };
 
   let foodX = {
+    coords: {
+      x: 0,
+      y: 0
+    },
     left: false,
     right: false
   };
@@ -97,19 +111,35 @@ app.post('/move', (request, response) => {
       if (myHeadX === foodArray[i].x) {
         if (myHeadY > foodArray[i].y) {
           foodY.above = true;
+          foodY.coords = {
+            x: foodArray[i].x,
+            y: foodArray[i].y
+          };
           return;
         } 
         else if (myHeadY < foodArray[i].y) {
           foodY.below = true;
+          foodY.coords = {
+            x: foodArray[i].x,
+            y: foodArray[i].y
+          };
           return;
         }
       }
       if (myHeadY === foodArray[i].y) {
         if (myHeadX > foodArray[i].x) {
           foodX.left = true;
+          foodX.coords = {
+            x: foodArray[i].x,
+            y: foodArray[i].y
+          };
           return;
         } else if (myHeadX < foodArray[i].x) {
           foodX.right = true;
+          foodX.coords = {
+            x: foodArray[i].x,
+            y: foodArray[i].y
+          };
           return;
         }
       }
@@ -165,6 +195,30 @@ app.post('/move', (request, response) => {
     }
   }
 
+  // function bodyBetweenFood(head, axisOne, axisTwo, foodObject) {
+  //   for (let i = 1; i < myBody.length; i ++) {
+  //     if (head[axisOne] === foodObject[i][axisOne] && head[axisOne])
+  //   }
+
+  // }
+
+  function bodyBetweenFood() {
+    for (let i = 1; i < myBody.length; i ++) {
+      if (myHeadX === myBody[i].x && myHeadY > myBody[i].y) {
+        blocked.up = true;
+      }
+      if (myHeadX === myBody[i].x && myHeadY < myBody[i].y) {
+        blocked.down = true;
+      }
+      if (myHeadY === myBody[i].y && myHeadX > myBody[i].x) {
+        blocked.left = true;
+      }
+      if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
+        blocked.right = true;
+      }
+    }
+  }
+
   let data = {
     move: 'right', // one of: ['up','down','left','right']
   }
@@ -196,29 +250,30 @@ app.post('/move', (request, response) => {
   }
   
   checkForFood();
+  bodyBetweenFood();
 
-  if (foodY.above) {
+  if (foodY.above && !blocked.up) {
     console.log(foodY);
     console.log("============");
     data.move = 'up';
     foodY.above = false;
   }
 
-  if (foodY.below) {
+  if (foodY.below && !blocked.down) {
     console.log(foodY);
     console.log("============");
     data.move = 'down';
     foodY.below = false;
   }
 
-  if (foodX.left) {
+  if (foodX.left && !blocked.left) {
     console.log(foodX);
     console.log("============");
     data.move = 'left';
     foodX.left = false;
   }
 
-  if (foodX.right) {
+  if (foodX.right && !blocked.right) {
     console.log(foodX);
     console.log("============");
     data.move = 'right';
@@ -228,6 +283,12 @@ app.post('/move', (request, response) => {
   checkForBody();
   doubleCheck();
   checkCounter = 0;
+  blocked = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  };
 
 
 
