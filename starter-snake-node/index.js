@@ -71,6 +71,7 @@ app.post('/move', (request, response) => {
   // NOTE: Do something here to generate your move
   let checkCounter = 0;
   const myBody = request.body.you.body;
+  let myId = request.body.you.id;
   let myHeadY = myBody[0].y;
   let myHeadX = myBody[0].x;
   let blocked = {
@@ -105,6 +106,9 @@ app.post('/move', (request, response) => {
     left: false,
     right: false
   }
+
+  let snakeArray = request.body.board.snakes;
+  let enemySnakesArray = [];
 
   function checkForFood() {
     for (let i = 0; i < foodArray.length; i ++) {
@@ -165,6 +169,7 @@ app.post('/move', (request, response) => {
         // console.log(`HeadY: ${myHeadY}, downBodyY: ${myBody[i].y - 1}`);
       }
     }
+    checkForEnemies();
   };
 
   function doubleCheck() {
@@ -220,6 +225,39 @@ app.post('/move', (request, response) => {
       // }
     }
   }
+
+  function checkForEnemies() {
+    for (let i = 0; i < snakeArray.length; i ++) {
+      if (myId !== snakeArray[i].id) {
+        enemySnakesArray.push(snakeArray[i]);
+      }
+    }
+    for (let i = 0; i < enemySnakesArray.length; i ++) {
+      for (let k = 0; k < enemySnakesArray[i].body.length; k ++) {
+        let enemySnake = enemySnakesArray[i].body;
+        if ((myHeadX + 1) === enemySnake[k].x && myHeadY === enemySnake[k].y) {
+          console.log("ENEMIES1");
+          noCollisionCheckCompass.right = true
+          // console.log(`HeadX: ${myHeadX}, rightBodyX: ${myBody[i].x + 1}`);
+        }
+        if ((myHeadX - 1) === enemySnake[k].x && myHeadY === enemySnake[k].y) {
+          console.log("ENEMIES2");
+          noCollisionCheckCompass.left = true
+          // console.log(`HeadX: ${myHeadX}, leftBodyX: ${enemySnake[k].x - 1}`);
+        }
+        if ((myHeadY - 1) === enemySnake[k].y && myHeadX === enemySnake[k].x) {
+          console.log("ENEMIES3");
+          noCollisionCheckCompass.up = true
+          // console.log(`HeadY: ${myHeadY}, upBodyY: ${enemySnake[k].y + 1}`);
+        }
+        if ((myHeadY + 1) === enemySnake[k].y && myHeadX === enemySnake[k].x) {
+          console.log("ENEMIES4");
+          noCollisionCheckCompass.down = true
+          // console.log(`HeadY: ${myHeadY}, downBodyY: ${enemySnake.y - 1}`);
+        }
+      }
+    }
+  };
 
   let data = {
     move: 'right', // one of: ['up','down','left','right']
@@ -296,12 +334,13 @@ app.post('/move', (request, response) => {
 
   // console.log("Snake head: ", myBody[0]);
   // console.log("============");
-  console.log(data.move);
+  // console.log(data.move);
   console.log("============");
-  console.log("Turn #: ", request.body.turn);
+  console.log(request.body.board.snakes);
+  console.log(request.body.you);
   console.log("============");
+  // console.log("Turn #: ", request.body.turn);
   // console.log(myBody);
-  // console.log(request.body);
   // console.log("============");
   // console.log(myBody[0], "=========", myBody[1]);
   // console.log("============");
