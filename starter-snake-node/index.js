@@ -23,6 +23,23 @@ const {
   //     return;
   //   }
   // };
+
+  // function checkForBody(head, bodyArray){
+  //   for (let i = 1; i < bodyArray.length; i ++) {
+  //     if ((head.x + 1) === bodyArray[i].x && head.y === bodyArray[i].y) {
+  //       noCollisionCheckCompass.right = true
+  //     }
+  //     if ((head.x - 1) === bodyArray[i].x && head.y === bodyArray[i].y) {
+  //       noCollisionCheckCompass.left = true
+  //     }
+  //     if ((head.y + 1) === bodyArray[i].y && head.x === bodyArray[i].x) {
+  //       noCollisionCheckCompass.up = true
+  //     }
+  //     if ((head.y - 1) === bodyArray[i].y && head.x === bodyArray[i].x) {
+  //       noCollisionCheckCompass.down = true
+  //     }
+  //   }
+  // };
 // </Functions>
 
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -61,6 +78,12 @@ app.post('/move', (request, response) => {
     above: false,
     below: false
   };
+  let noCollisionCheckCompass = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  }
 
   function checkForFood() {
     for (let i = 0; i < foodArray.length; i ++) {
@@ -73,6 +96,27 @@ app.post('/move', (request, response) => {
           foodY.below = true;
           return;
         }
+      }
+    }
+  };
+
+  function checkForBody(){
+    for (let i = 1; i < myBody.length; i ++) {
+      if ((myHeadX + 1) === myBody[i].x && myHeadY === myBody[i].y) {
+        noCollisionCheckCompass.right = true
+        // console.log(`HeadX: ${myHeadX}, rightBodyX: ${myBody[i].x + 1}`);
+      }
+      if ((myHeadX - 1) === myBody[i].x && myHeadY === myBody[i].y) {
+        noCollisionCheckCompass.left = true
+        // console.log(`HeadX: ${myHeadX}, leftBodyX: ${myBody[i].x - 1}`);
+      }
+      if ((myHeadY - 1) === myBody[i].y && myHeadX === myBody[i].x) {
+        noCollisionCheckCompass.up = true
+        // console.log(`HeadY: ${myHeadY}, upBodyY: ${myBody[i].y + 1}`);
+      }
+      if ((myHeadY + 1) === myBody[i].y && myHeadX === myBody[i].x) {
+        noCollisionCheckCompass.down = true
+        // console.log(`HeadY: ${myHeadY}, downBodyY: ${myBody[i].y - 1}`);
       }
     }
   };
@@ -123,18 +167,41 @@ app.post('/move', (request, response) => {
     foodY.below = false;
   }
 
-  if (myBody)
+  checkForBody();
+
+  if (data.move === 'up' && noCollisionCheckCompass.up) {
+    data.move = 'right';
+    noCollisionCheckCompass.up = false;
+    console.log("Going right");
+  }
+  if (data.move === 'right' && noCollisionCheckCompass.right) {
+    data.move = 'down';
+    noCollisionCheckCompass.right = false;
+    console.log("Going down");
+  }
+  if (data.move === 'down' && noCollisionCheckCompass.down) {
+    data.move = 'left';
+    noCollisionCheckCompass.down = false;
+    console.log("Going left");
+  }
+  if (data.move === 'left' && noCollisionCheckCompass.left) {
+    data.move = 'up';
+    noCollisionCheckCompass.left = false;
+    console.log("Going up");
+  }
 
 
 
   // console.log("Snake head: ", myBody[0]);
   // console.log("============");
-  // console.log(data.move);
-  // console.log("============");
-  // console.log("Turn #: ", request.body.turn);
+  console.log(data.move);
+  console.log("============");
+  console.log("Turn #: ", request.body.turn);
   console.log("============");
   console.log(myBody);
   // console.log(request.body);
+  console.log("============");
+  console.log(myBody[0], "=========", myBody[1]);
   console.log("============");
   // console.log(foodArray);
 
