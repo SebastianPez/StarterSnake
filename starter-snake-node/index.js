@@ -69,6 +69,7 @@ app.post('/start', (request, response) => {
 // Handle POST request to '/move'
 app.post('/move', (request, response) => {
   // NOTE: Do something here to generate your move
+  let checkCounter = 0;
   const myBody = request.body.you.body;
   let myHeadY = myBody[0].y;
   let myHeadX = myBody[0].x;
@@ -78,6 +79,12 @@ app.post('/move', (request, response) => {
     above: false,
     below: false
   };
+
+  let foodX = {
+    left: false,
+    right: false
+  };
+
   let noCollisionCheckCompass = {
     up: false,
     down: false,
@@ -94,6 +101,15 @@ app.post('/move', (request, response) => {
         } 
         else if (myHeadY < foodArray[i].y) {
           foodY.below = true;
+          return;
+        }
+      }
+      if (myHeadY === foodArray[i].y) {
+        if (myHeadX > foodArray[i].x) {
+          foodX.left = true;
+          return;
+        } else if (myHeadX < foodArray[i].x) {
+          foodX.right = true;
           return;
         }
       }
@@ -120,6 +136,34 @@ app.post('/move', (request, response) => {
       }
     }
   };
+
+  function doubleCheck() {
+    if (data.move === 'up' && noCollisionCheckCompass.up) {
+      data.move = 'right';
+      // console.log("Going right");
+    }
+    if (data.move === 'right' && noCollisionCheckCompass.right) {
+      data.move = 'down';
+      // console.log("Going down");
+    }
+    if (data.move === 'down' && noCollisionCheckCompass.down) {
+      data.move = 'left';
+      // console.log("Going left");
+    }
+    if (data.move === 'left' && noCollisionCheckCompass.left) {
+      data.move = 'up';
+      // console.log("Going up");
+    }
+    noCollisionCheckCompass.up = false;
+    noCollisionCheckCompass.right = false;
+    noCollisionCheckCompass.down = false;
+    noCollisionCheckCompass.left = false;
+    if (noCollisionCheckCompass.up && checkCounter === 0 && data.move === 'up') {
+      checkCounter += 1;
+      checkForBody();
+      doubleCheck();
+    }
+  }
 
   let data = {
     move: 'right', // one of: ['up','down','left','right']
@@ -167,28 +211,23 @@ app.post('/move', (request, response) => {
     foodY.below = false;
   }
 
-  checkForBody();
-
-  if (data.move === 'up' && noCollisionCheckCompass.up) {
-    data.move = 'right';
-    noCollisionCheckCompass.up = false;
-    console.log("Going right");
-  }
-  if (data.move === 'right' && noCollisionCheckCompass.right) {
-    data.move = 'down';
-    noCollisionCheckCompass.right = false;
-    console.log("Going down");
-  }
-  if (data.move === 'down' && noCollisionCheckCompass.down) {
+  if (foodX.left) {
+    console.log(foodX);
+    console.log("============");
     data.move = 'left';
-    noCollisionCheckCompass.down = false;
-    console.log("Going left");
+    foodX.left = false;
   }
-  if (data.move === 'left' && noCollisionCheckCompass.left) {
-    data.move = 'up';
-    noCollisionCheckCompass.left = false;
-    console.log("Going up");
+
+  if (foodX.right) {
+    console.log(foodX);
+    console.log("============");
+    data.move = 'right';
+    foodX.right = false;
   }
+
+  checkForBody();
+  doubleCheck();
+  checkCounter = 0;
 
 
 
@@ -198,11 +237,11 @@ app.post('/move', (request, response) => {
   console.log("============");
   console.log("Turn #: ", request.body.turn);
   console.log("============");
-  console.log(myBody);
+  // console.log(myBody);
   // console.log(request.body);
-  console.log("============");
-  console.log(myBody[0], "=========", myBody[1]);
-  console.log("============");
+  // console.log("============");
+  // console.log(myBody[0], "=========", myBody[1]);
+  // console.log("============");
   // console.log(foodArray);
 
 
