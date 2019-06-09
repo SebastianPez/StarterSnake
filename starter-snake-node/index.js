@@ -323,9 +323,11 @@ app.post('/move', (request, response) => {
       if (myHeadX === myBody[i].x && headDistanceFood.fdY.y > headDistanceBody.fdY.y) {
         if (myBody[i].y > myHeadY) {
           blocked.down = true;
+          console.log("Blocked Down");
         }
         if (myBody[i].y < myHeadY) { 
           blocked.up = true;
+          console.log("Blocked Up");
         }
       }
       // if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
@@ -333,9 +335,11 @@ app.post('/move', (request, response) => {
       if (myHeadY === myBody[i].y && headDistanceFood.fdX.x > headDistanceBody.fdX.x) {
         if (myBody[i].x > myHeadX) {
           blocked.right = true;
+          console.log("Blocked Right");
         }
         if (myBody[i].x < myHeadX){
           blocked.left = true;
+          console.log("Blocked left");
         }
       }
       // if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
