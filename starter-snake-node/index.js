@@ -152,7 +152,7 @@ app.post('/move', (request, response) => {
     right: false
   };
 
-  let noCollisionCheckCompass = {
+  let bodyBetweenFoodCompass = {
     up: false,
     down: false,
     left: false,
@@ -204,39 +204,39 @@ app.post('/move', (request, response) => {
 
   function checkForWalls() {
     if (myHeadY === 14) {
-      noCollisionCheckCompass.down = true;
+      blocked.down = true;
       if (myHeadX === 14) {
-        noCollisionCheckCompass.right = true;
+        blocked.right = true;
       }
       if (myHeadX === 0) {
-        noCollisionCheckCompass.left = true;
+        blocked.left = true;
       }
     }
     if (myHeadX === 0) {
-      noCollisionCheckCompass.left = true;
+      blocked.left = true;
       if (myHeadY === 14) {
-        noCollisionCheckCompass.down = true;
+        blocked.down = true;
       }
       if (myHeadY === 0) {
-        noCollisionCheckCompass.up = true;
+        blocked.up = true;
       }
     }
     if (myHeadY === 0) {
-      noCollisionCheckCompass.up = true;
+      blocked.up = true;
       if (myHeadX === 14) {
-        noCollisionCheckCompass.right = true;
+        blocked.right = true;
       }
       if (myHeadX === 0) {
-        noCollisionCheckCompass.left = true;
+        blocked.left = true;
       }
     }
     if (myHeadX === 14) {
-      noCollisionCheckCompass.right = true;
+      blocked.right = true;
       if (myHeadY === 14) {
-        noCollisionCheckCompass.down = true;
+        blocked.down = true;
       }
       if (myHeadY === 0) {
-        noCollisionCheckCompass.up = true;
+        blocked.up = true;
       }
     }
   }
@@ -244,19 +244,19 @@ app.post('/move', (request, response) => {
   function checkForBody(){
     for (let i = 1; i < myBody.length; i ++) {
       if ((myHeadX + 1) === myBody[i].x && myHeadY === myBody[i].y) {
-        noCollisionCheckCompass.right = true
+        blocked.right = true
         // console.log(`HeadX: ${myHeadX}, rightBodyX: ${myBody[i].x + 1}`);
       }
       if ((myHeadX - 1) === myBody[i].x && myHeadY === myBody[i].y) {
-        noCollisionCheckCompass.left = true
+        blocked.left = true
         // console.log(`HeadX: ${myHeadX}, leftBodyX: ${myBody[i].x - 1}`);
       }
       if ((myHeadY - 1) === myBody[i].y && myHeadX === myBody[i].x) {
-        noCollisionCheckCompass.up = true
+        blocked.up = true
         // console.log(`HeadY: ${myHeadY}, upBodyY: ${myBody[i].y + 1}`);
       }
       if ((myHeadY + 1) === myBody[i].y && myHeadX === myBody[i].x) {
-        noCollisionCheckCompass.down = true
+        blocked.down = true
         // console.log(`HeadY: ${myHeadY}, downBodyY: ${myBody[i].y - 1}`);
       }
     }
@@ -265,27 +265,23 @@ app.post('/move', (request, response) => {
   };
 
   function doubleCheck() {
-    if (data.move === 'up' && noCollisionCheckCompass.up) {
+    if (data.move === 'up' && blocked.up) {
       data.move = 'right';
       // console.log("Going right");
     }
-    if (data.move === 'right' && noCollisionCheckCompass.right) {
+    if (data.move === 'right' && blocked.right) {
       data.move = 'down';
       // console.log("Going down");
     }
-    if (data.move === 'down' && noCollisionCheckCompass.down) {
+    if (data.move === 'down' && blocked.down) {
       data.move = 'left';
       // console.log("Going left");
     }
-    if (data.move === 'left' && noCollisionCheckCompass.left) {
+    if (data.move === 'left' && blocked.left) {
       data.move = 'up';
       // console.log("Going up");
     }
-    noCollisionCheckCompass.up = false;
-    noCollisionCheckCompass.right = false;
-    noCollisionCheckCompass.down = false;
-    noCollisionCheckCompass.left = false;
-    if (noCollisionCheckCompass.up && checkCounter === 0 && data.move === 'up') {
+    if (blocked.up && checkCounter === 0 && data.move === 'up') {
       checkCounter += 1;
       checkForBody();
       doubleCheck();
@@ -297,8 +293,6 @@ app.post('/move', (request, response) => {
   function bodyBetweenFood() {
     for (let i = 1; i < myBody.length; i ++) {
       let headDistanceFood = {
-        // x: Math.abs(myHeadX - foodX.coords.x),
-        // y: Math.abs(myHeadY - foodY.coords.y),
         fdX: {
           x: Math.abs(myHeadX - foodX.coords.x),
           y: Math.abs(myHeadY - foodX.coords.y)
@@ -309,8 +303,6 @@ app.post('/move', (request, response) => {
         }
       };
       let headDistanceBody = {
-        // x: Math.abs(myBody[i].x - foodX.coords.x),
-        // y: Math.abs(myBody[i].y - foodY.coords.y),
         fdX: {
           x: Math.abs(myBody[i].x - foodX.coords.x),
           y: Math.abs(myBody[i].y - foodX.coords.y)
@@ -322,28 +314,24 @@ app.post('/move', (request, response) => {
       };
       if (myHeadX === myBody[i].x && headDistanceFood.fdY.y > headDistanceBody.fdY.y) {
         if (myBody[i].y > myHeadY) {
-          blocked.down = true;
-          console.log("Blocked Down");
+          bodyBetweenFoodCompass.down = true;
+          // console.log("Blocked Down");
         }
         if (myBody[i].y < myHeadY) { 
-          blocked.up = true;
-          console.log("Blocked Up");
+          bodyBetweenFoodCompass.up = true;
+          // console.log("Blocked Up");
         }
       }
-      // if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
-      // }
       if (myHeadY === myBody[i].y && headDistanceFood.fdX.x > headDistanceBody.fdX.x) {
         if (myBody[i].x > myHeadX) {
-          blocked.right = true;
-          console.log("Blocked Right");
+          bodyBetweenFoodCompass.right = true;
+          // console.log("Blocked Right");
         }
         if (myBody[i].x < myHeadX){
-          blocked.left = true;
-          console.log("Blocked left");
+          bodyBetweenFoodCompass.left = true;
+          // console.log("Blocked left")
         }
       }
-      // if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
-      // }
     }
   }
 
@@ -358,22 +346,22 @@ app.post('/move', (request, response) => {
         let enemySnake = enemySnakesArray[i].body;
         if ((myHeadX + 1) === enemySnake[k].x && myHeadY === enemySnake[k].y) {
           console.log("ENEMIES1");
-          noCollisionCheckCompass.right = true
+          blocked.right = true
           // console.log(`HeadX: ${myHeadX}, rightBodyX: ${myBody[i].x + 1}`);
         }
         if ((myHeadX - 1) === enemySnake[k].x && myHeadY === enemySnake[k].y) {
           console.log("ENEMIES2");
-          noCollisionCheckCompass.left = true
+          blocked.left = true
           // console.log(`HeadX: ${myHeadX}, leftBodyX: ${enemySnake[k].x - 1}`);
         }
         if ((myHeadY - 1) === enemySnake[k].y && myHeadX === enemySnake[k].x) {
           console.log("ENEMIES3");
-          noCollisionCheckCompass.up = true
+          blocked.up = true
           // console.log(`HeadY: ${myHeadY}, upBodyY: ${enemySnake[k].y + 1}`);
         }
         if ((myHeadY + 1) === enemySnake[k].y && myHeadX === enemySnake[k].x) {
           console.log("ENEMIES4");
-          noCollisionCheckCompass.down = true
+          blocked.down = true
           // console.log(`HeadY: ${myHeadY}, downBodyY: ${enemySnake.y - 1}`);
         }
       }
@@ -384,57 +372,31 @@ app.post('/move', (request, response) => {
     move: 'right', // one of: ['up','down','left','right']
   }
   
-  // if (myHeadY === 14) {
-  //   data.move = 'left';
-  // }
-  // if (myHeadX === 0) {
-  //   data.move = 'up';
-  // }
-  // if (myHeadY === 0) {
-  //   data.move = 'right';
-  // }
-  // if (myHeadX === 14) {
-  //   data.move = 'down';
-  // }
-
-  // if (myHeadY === 0 && myHeadX === 0) {
-  //   data.move = 'right';
-  // }
-  // if (myHeadY === 0 && myHeadX === 14) {
-  //   data.move = 'down';
-  // }
-  // if (myHeadY === 14 && myHeadX === 14) {
-  //   data.move = 'left';
-  // }
-  // if (myHeadY === 14 && myHeadX === 0) {
-  //   data.move = 'up';
-  // }
-  
   checkForFood();
   bodyBetweenFood();
 
-  if (foodY.above && !blocked.up) {
+  if (foodY.above && !blocked.up && !bodyBetweenFoodCompass.up) {
     console.log(foodY);
     console.log("============");
     data.move = 'up';
     foodY.above = false;
   }
 
-  if (foodY.below && !blocked.down) {
+  if (foodY.below && !blocked.down && !bodyBetweenFoodCompass.down) {
     console.log(foodY);
     console.log("============");
     data.move = 'down';
     foodY.below = false;
   }
 
-  if (foodX.left && !blocked.left) {
+  if (foodX.left && !blocked.left && !bodyBetweenFoodCompass.left) {
     console.log(foodX);
     console.log("============");
     data.move = 'left';
     foodX.left = false;
   }
 
-  if (foodX.right && !blocked.right) {
+  if (foodX.right && !blocked.right && !bodyBetweenFoodCompass.right) {
     console.log(foodX);
     console.log("============");
     data.move = 'right';
@@ -444,23 +406,34 @@ app.post('/move', (request, response) => {
   checkForBody();
   doubleCheck();
   checkCounter = 0;
+  console.log("=============+=============");
+  console.log(blocked);
+  console.log("============");
+  console.log(bodyBetweenFoodCompass);
   blocked = {
     up: false,
     down: false,
     left: false,
     right: false
   };
+  bodyBetweenFoodCompass = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+  }
 
 
 
   // console.log("Snake head: ", myBody[0]);
-  // console.log("============");
-  // console.log(data.move);
   console.log("============");
-  console.log(request.body.board.snakes);
-  console.log(request.body.you);
+  console.log("Turn #: ", request.body.turn);
   console.log("============");
-  // console.log("Turn #: ", request.body.turn);
+  console.log(data.move);
+  console.log("============");
+  // console.log(request.body.board.snakes);
+  // console.log(request.body.you);
+  console.log("=============+=============");
   // console.log(myBody);
   // console.log("============");
   // console.log(myBody[0], "=========", myBody[1]);
