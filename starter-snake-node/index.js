@@ -40,6 +40,58 @@ const {
   //     }
   //   }
   // };
+
+  // function checkForWalls() {
+  //   if (myHeadY === 14) {
+  //     noCollisionCheckCompass.down = true;
+  //     if (myHeadX === 14) {
+  //       noCollisionCheckCompass.right = true;
+  //     }
+  //     if (myHeadX === 0) {
+  //       noCollisionCheckCompass.left = true;
+  //     }
+  //   }
+  //   if (myHeadX === 0) {
+  //     noCollisionCheckCompass.left = true;
+  //     if (myHeadY === 14) {
+  //       noCollisionCheckCompass.down = true;
+  //     }
+  //     if (myHeadY === 0) {
+  //       noCollisionCheckCompass.up = true;
+  //     }
+  //   }
+  //   if (myHeadY === 0) {
+  //     noCollisionCheckCompass.up = true;
+  //     if (myHeadX === 14) {
+  //       noCollisionCheckCompass.right = true;
+  //     }
+  //     if (myHeadX === 0) {
+  //       noCollisionCheckCompass.left = true;
+  //     }
+  //   }
+  //   if (myHeadX === 14) {
+  //     noCollisionCheckCompass.right = true;
+  //     if (myHeadY === 14) {
+  //       noCollisionCheckCompass.down = true;
+  //     }
+  //     if (myHeadY === 0) {
+  //       noCollisionCheckCompass.up = true;
+  //     }
+  //   }
+  
+    // if (myHeadY === 0 && myHeadX === 0) {
+    //   data.move = 'right';
+    // }
+    // if (myHeadY === 0 && myHeadX === 14) {
+    //   data.move = 'down';
+    // }
+    // if (myHeadY === 14 && myHeadX === 14) {
+    //   data.move = 'left';
+    // }
+    // if (myHeadY === 14 && myHeadX === 0) {
+    //   data.move = 'up';
+    // }
+  // }
 // </Functions>
 
 // For deployment to Heroku, the port needs to be set using ENV, so
@@ -119,7 +171,7 @@ app.post('/move', (request, response) => {
             x: foodArray[i].x,
             y: foodArray[i].y
           };
-          return;
+          // return;
         } 
         else if (myHeadY < foodArray[i].y) {
           foodY.below = true;
@@ -127,7 +179,7 @@ app.post('/move', (request, response) => {
             x: foodArray[i].x,
             y: foodArray[i].y
           };
-          return;
+          // return;
         }
       }
       if (myHeadY === foodArray[i].y) {
@@ -137,18 +189,57 @@ app.post('/move', (request, response) => {
             x: foodArray[i].x,
             y: foodArray[i].y
           };
-          return;
+          // return;
         } else if (myHeadX < foodArray[i].x) {
           foodX.right = true;
           foodX.coords = {
             x: foodArray[i].x,
             y: foodArray[i].y
           };
-          return;
+          // return;
         }
       }
     }
   };
+
+  function checkForWalls() {
+    if (myHeadY === 14) {
+      noCollisionCheckCompass.down = true;
+      if (myHeadX === 14) {
+        noCollisionCheckCompass.right = true;
+      }
+      if (myHeadX === 0) {
+        noCollisionCheckCompass.left = true;
+      }
+    }
+    if (myHeadX === 0) {
+      noCollisionCheckCompass.left = true;
+      if (myHeadY === 14) {
+        noCollisionCheckCompass.down = true;
+      }
+      if (myHeadY === 0) {
+        noCollisionCheckCompass.up = true;
+      }
+    }
+    if (myHeadY === 0) {
+      noCollisionCheckCompass.up = true;
+      if (myHeadX === 14) {
+        noCollisionCheckCompass.right = true;
+      }
+      if (myHeadX === 0) {
+        noCollisionCheckCompass.left = true;
+      }
+    }
+    if (myHeadX === 14) {
+      noCollisionCheckCompass.right = true;
+      if (myHeadY === 14) {
+        noCollisionCheckCompass.down = true;
+      }
+      if (myHeadY === 0) {
+        noCollisionCheckCompass.up = true;
+      }
+    }
+  }
 
   function checkForBody(){
     for (let i = 1; i < myBody.length; i ++) {
@@ -169,6 +260,7 @@ app.post('/move', (request, response) => {
         // console.log(`HeadY: ${myHeadY}, downBodyY: ${myBody[i].y - 1}`);
       }
     }
+    checkForWalls();
     checkForEnemies();
   };
 
@@ -201,25 +293,50 @@ app.post('/move', (request, response) => {
   }
 
 
+
   function bodyBetweenFood() {
     for (let i = 1; i < myBody.length; i ++) {
       let headDistanceFood = {
-        x: Math.abs(myHeadX - foodX.coords.x),
-        y: Math.abs(myHeadY - foodY.coords.y)
+        // x: Math.abs(myHeadX - foodX.coords.x),
+        // y: Math.abs(myHeadY - foodY.coords.y),
+        fdX: {
+          x: Math.abs(myHeadX - foodX.coords.x),
+          y: Math.abs(myHeadY - foodX.coords.y)
+        },
+        fdY: {
+          x: Math.abs(myHeadX - foodY.coords.x),
+          y: Math.abs(myHeadY - foodY.coords.y)
+        }
       };
       let headDistanceBody = {
-        x: Math.abs(myBody[i].x - foodX.coords.x),
-        y: Math.abs(myBody[i].y - foodY.coords.y)
+        // x: Math.abs(myBody[i].x - foodX.coords.x),
+        // y: Math.abs(myBody[i].y - foodY.coords.y),
+        fdX: {
+          x: Math.abs(myBody[i].x - foodX.coords.x),
+          y: Math.abs(myBody[i].y - foodX.coords.y)
+        },
+        fdY: {
+          x: Math.abs(myBody[i].x - foodY.coords.x),
+          y: Math.abs(myBody[i].y - foodY.coords.y)
+        }
       };
-      if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
-        blocked.up = true;
-        blocked.down = true;
+      if (myHeadX === myBody[i].x && headDistanceFood.fdY.y > headDistanceBody.fdY.y) {
+        if (myBody[i].y > myHeadY) {
+          blocked.down = true;
+        }
+        if (myBody[i].y < myHeadY) { 
+          blocked.up = true;
+        }
       }
       // if (myHeadX === myBody[i].x && headDistanceFood.y > headDistanceBody.y) {
       // }
-      if (myHeadY === myBody[i].y && headDistanceFood.x > headDistanceBody.x) {
-        blocked.left = true;
-        blocked.right = true;
+      if (myHeadY === myBody[i].y && headDistanceFood.fdX.x > headDistanceBody.fdX.x) {
+        if (myBody[i].x > myHeadX) {
+          blocked.right = true;
+        }
+        if (myBody[i].x < myHeadX){
+          blocked.left = true;
+        }
       }
       // if (myHeadY === myBody[i].y && myHeadX < myBody[i].x) {
       // }
@@ -263,31 +380,31 @@ app.post('/move', (request, response) => {
     move: 'right', // one of: ['up','down','left','right']
   }
   
-  if (myHeadY === 14) {
-    data.move = 'left';
-  }
-  if (myHeadX === 0) {
-    data.move = 'up';
-  }
-  if (myHeadY === 0) {
-    data.move = 'right';
-  }
-  if (myHeadX === 14) {
-    data.move = 'down';
-  }
+  // if (myHeadY === 14) {
+  //   data.move = 'left';
+  // }
+  // if (myHeadX === 0) {
+  //   data.move = 'up';
+  // }
+  // if (myHeadY === 0) {
+  //   data.move = 'right';
+  // }
+  // if (myHeadX === 14) {
+  //   data.move = 'down';
+  // }
 
-  if (myHeadY === 0 && myHeadX === 0) {
-    data.move = 'right';
-  }
-  if (myHeadY === 0 && myHeadX === 14) {
-    data.move = 'down';
-  }
-  if (myHeadY === 14 && myHeadX === 14) {
-    data.move = 'left';
-  }
-  if (myHeadY === 14 && myHeadX === 0) {
-    data.move = 'up';
-  }
+  // if (myHeadY === 0 && myHeadX === 0) {
+  //   data.move = 'right';
+  // }
+  // if (myHeadY === 0 && myHeadX === 14) {
+  //   data.move = 'down';
+  // }
+  // if (myHeadY === 14 && myHeadX === 14) {
+  //   data.move = 'left';
+  // }
+  // if (myHeadY === 14 && myHeadX === 0) {
+  //   data.move = 'up';
+  // }
   
   checkForFood();
   bodyBetweenFood();
