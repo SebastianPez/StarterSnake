@@ -134,22 +134,33 @@ app.post('/move', (request, response) => {
   };
   // Array of food objects on the board.
   const foodArray = request.body.board.food;
-  let foodY = {
-    coords: {
-      x: 0,
-      y: 0
-    },
-    above: false,
-    below: false
-  };
+  // let foodY = {
+  //   coords: {
+  //     x: 0,
+  //     y: 0
+  //   },
+  //   above: false,
+  //   below: false
+  // };
 
-  let foodX = {
+  // let foodX = {
+  //   coords: {
+  //     x: 0,
+  //     y: 0
+  //   },
+  //   left: false,
+  //   right: false
+  // };
+
+  let closestFood = {
+    x: 0,
+    y: 0,
     coords: {
-      x: 0,
-      y: 0
-    },
-    left: false,
-    right: false
+      up: false,
+      down: false,
+      left: false,
+      right: false
+    }
   };
 
   let bodyBetweenFoodCompass = {
@@ -157,50 +168,93 @@ app.post('/move', (request, response) => {
     down: false,
     left: false,
     right: false
-  }
+  };
 
   let snakeArray = request.body.board.snakes;
   let enemySnakesArray = [];
 
-  function checkForFood() {
-    for (let i = 0; i < foodArray.length; i ++) {
-      if (myHeadX === foodArray[i].x) {
-        if (myHeadY > foodArray[i].y) {
-          foodY.above = true;
-          foodY.coords = {
-            x: foodArray[i].x,
-            y: foodArray[i].y
-          };
-          // return;
-        } 
-        else if (myHeadY < foodArray[i].y) {
-          foodY.below = true;
-          foodY.coords = {
-            x: foodArray[i].x,
-            y: foodArray[i].y
-          };
-          // return;
-        }
-      }
-      if (myHeadY === foodArray[i].y) {
-        if (myHeadX > foodArray[i].x) {
-          foodX.left = true;
-          foodX.coords = {
-            x: foodArray[i].x,
-            y: foodArray[i].y
-          };
-          // return;
-        } else if (myHeadX < foodArray[i].x) {
-          foodX.right = true;
-          foodX.coords = {
-            x: foodArray[i].x,
-            y: foodArray[i].y
-          };
-          // return;
-        }
-      }
+  function foodDirection() {
+    if (closestFood.x < myHeadX) {
+      closestFood.coords.left = true;
+    }
+    if (closestFood.x > myHeadX) {
+      closestFood.coords.right = true;
+    }
+    if (closestFood.y < myHeadY) {
+      closestFood.coords.up = true;
+    }
+    if (closestFood.y > myHeadY) {
+      closestFood.coords.down = true;
     }
   };
+
+  function checkForFood() {
+    let tempFood = {
+      x: 16,
+      y: 16
+    };
+    for (let i = 0; i < foodArray.length; i ++) {
+      // if (Math.abs((myHeadX - foodArray[i].x) < Math.abs(myHeadX - tempFood.x))) {
+      //   tempFood.x = foodArray[i].x;
+      //   tempFood.y = foodArray[i].y;
+      // }
+      let absX = Math.abs(myHeadX - foodArray[i].x);
+      let absY = Math.abs(myHeadY - foodArray[i].y);
+      let distanceFromHead = absX + absY;
+
+      let tempX = Math.abs(myHeadX - tempFood.x);
+      let tempY = Math.abs(myHeadY - tempFood.y);
+      let currentClosestDistance = tempX + tempY;
+      if (distanceFromHead < currentClosestDistance) {
+        tempFood.x = foodArray[i].x;
+        tempFood.y = foodArray[i].y;
+      }
+    };
+    closestFood.x = tempFood.x;
+    closestFood.y = tempFood.y;
+    foodDirection();
+  };
+
+
+  // function checkForFood() {
+  //   for (let i = 0; i < foodArray.length; i ++) {
+  //     if (myHeadX === foodArray[i].x) {
+  //       if (myHeadY > foodArray[i].y) {
+  //         foodY.above = true;
+  //         foodY.coords = {
+  //           x: foodArray[i].x,
+  //           y: foodArray[i].y
+  //         };
+  //         // return;
+  //       } 
+  //       else if (myHeadY < foodArray[i].y) {
+  //         foodY.below = true;
+  //         foodY.coords = {
+  //           x: foodArray[i].x,
+  //           y: foodArray[i].y
+  //         };
+  //         // return;
+  //       }
+  //     }
+  //     if (myHeadY === foodArray[i].y) {
+  //       if (myHeadX > foodArray[i].x) {
+  //         foodX.left = true;
+  //         foodX.coords = {
+  //           x: foodArray[i].x,
+  //           y: foodArray[i].y
+  //         };
+  //         // return;
+  //       } else if (myHeadX < foodArray[i].x) {
+  //         foodX.right = true;
+  //         foodX.coords = {
+  //           x: foodArray[i].x,
+  //           y: foodArray[i].y
+  //         };
+  //         // return;
+  //       }
+  //     }
+  //   }
+  // };
 
   function checkForWalls() {
     if (myHeadY === 14) {
@@ -267,19 +321,19 @@ app.post('/move', (request, response) => {
   function doubleCheck() {
     if (data.move === 'up' && blocked.up) {
       data.move = 'right';
-      // console.log("Going right");
+      console.log("Doublecheck: right");
     }
     if (data.move === 'right' && blocked.right) {
       data.move = 'down';
-      // console.log("Going down");
+      console.log("Doublecheck: down");
     }
     if (data.move === 'down' && blocked.down) {
       data.move = 'left';
-      // console.log("Going left");
+      console.log("Doublecheck: left");
     }
     if (data.move === 'left' && blocked.left) {
       data.move = 'up';
-      // console.log("Going up");
+      console.log("Doublecheck: up");
     }
     if (blocked.up && checkCounter === 0 && data.move === 'up') {
       checkCounter += 1;
@@ -294,22 +348,22 @@ app.post('/move', (request, response) => {
     for (let i = 1; i < myBody.length; i ++) {
       let headDistanceFood = {
         fdX: {
-          x: Math.abs(myHeadX - foodX.coords.x),
-          y: Math.abs(myHeadY - foodX.coords.y)
+          x: Math.abs(myHeadX - closestFood.coords.x),
+          y: Math.abs(myHeadY - closestFood.coords.y)
         },
         fdY: {
-          x: Math.abs(myHeadX - foodY.coords.x),
-          y: Math.abs(myHeadY - foodY.coords.y)
+          x: Math.abs(myHeadX - closestFood.coords.x),
+          y: Math.abs(myHeadY - closestFood.coords.y)
         }
       };
       let headDistanceBody = {
         fdX: {
-          x: Math.abs(myBody[i].x - foodX.coords.x),
-          y: Math.abs(myBody[i].y - foodX.coords.y)
+          x: Math.abs(myBody[i].x - closestFood.coords.x),
+          y: Math.abs(myBody[i].y - closestFood.coords.y)
         },
         fdY: {
-          x: Math.abs(myBody[i].x - foodY.coords.x),
-          y: Math.abs(myBody[i].y - foodY.coords.y)
+          x: Math.abs(myBody[i].x - closestFood.coords.x),
+          y: Math.abs(myBody[i].y - closestFood.coords.y)
         }
       };
       if (myHeadX === myBody[i].x && headDistanceFood.fdY.y > headDistanceBody.fdY.y) {
@@ -375,38 +429,70 @@ app.post('/move', (request, response) => {
   checkForFood();
   bodyBetweenFood();
 
-  if (foodY.above && !blocked.up && !bodyBetweenFoodCompass.up) {
-    console.log(foodY);
+
+  if (closestFood.coords.up && !blocked.up && !bodyBetweenFoodCompass.up) {
+    console.log(closestFood);
+    console.log("Food up");
     console.log("============");
     data.move = 'up';
-    foodY.above = false;
+    closestFood.coords.up = false;
   }
 
-  if (foodY.below && !blocked.down && !bodyBetweenFoodCompass.down) {
-    console.log(foodY);
+  if (closestFood.coords.down && !blocked.down && !bodyBetweenFoodCompass.down) {
+    console.log(closestFood);
+    console.log("Food down");
     console.log("============");
     data.move = 'down';
-    foodY.below = false;
+    closestFood.coords.down = false;
   }
 
-  if (foodX.left && !blocked.left && !bodyBetweenFoodCompass.left) {
-    console.log(foodX);
+  if (closestFood.coords.left && !blocked.left && !bodyBetweenFoodCompass.left) {
+    console.log(closestFood);
+    console.log("Food left");
     console.log("============");
     data.move = 'left';
-    foodX.left = false;
+    closestFood.coords.left = false;
   }
 
-  if (foodX.right && !blocked.right && !bodyBetweenFoodCompass.right) {
-    console.log(foodX);
+  if (closestFood.coords.right && !blocked.right && !bodyBetweenFoodCompass.right) {
+    console.log(closestFood);
+    console.log("Food right");
     console.log("============");
     data.move = 'right';
-    foodX.right = false;
+    closestFood.coords.right = false;
   }
+  // if (foodY.above && !blocked.up && !bodyBetweenFoodCompass.up) {
+  //   console.log(foodY);
+  //   console.log("============");
+  //   data.move = 'up';
+  //   foodY.above = false;
+  // }
+
+  // if (foodY.below && !blocked.down && !bodyBetweenFoodCompass.down) {
+  //   console.log(foodY);
+  //   console.log("============");
+  //   data.move = 'down';
+  //   foodY.below = false;
+  // }
+
+  // if (foodX.left && !blocked.left && !bodyBetweenFoodCompass.left) {
+  //   console.log(foodX);
+  //   console.log("============");
+  //   data.move = 'left';
+  //   foodX.left = false;
+  // }
+
+  // if (foodX.right && !blocked.right && !bodyBetweenFoodCompass.right) {
+  //   console.log(foodX);
+  //   console.log("============");
+  //   data.move = 'right';
+  //   foodX.right = false;
+  // }
 
   checkForBody();
   doubleCheck();
   checkCounter = 0;
-  console.log("=============+=============");
+  console.log("=============+++=============");
   console.log(blocked);
   console.log("============");
   console.log(bodyBetweenFoodCompass);
