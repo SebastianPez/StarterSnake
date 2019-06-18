@@ -319,20 +319,76 @@ app.post('/move', (request, response) => {
   };
 
   function doubleCheck() {
+    let openSpace = {
+      up: 0,
+      down: 0,
+      left: 0,
+      right: 0
+    };
+    for (let i = 0; i < myBody.length; i ++) {
+      if (myHeadY !== myBody[i].y) {
+        // if (myHeadX > myBody[i].x) {
+          openSpace.left = myHeadX;
+        // }
+        // if (myHeadX < myBody[i].x) {
+          openSpace.right = Math.abs(myHeadX - 14);
+        // }
+      }
+      if (myHeadX !== myBody[i].x) {
+        // if (myHeadY > myBody[i].y) {
+          openSpace.up = myHeadY;
+        // }
+        // if (myHeadY < myBody[i].y) {
+          openSpace.down = Math.abs(myHeadY - 14);
+        // }
+      }
+    }
+    console.log('=+=+=+=+=+=+=+')
+    console.log(openSpace);
+    console.log('=+=+=+=+=+=+=+')
+
     if (data.move === 'up' && blocked.up) {
-      data.move = 'right';
+      if (openSpace.right > openSpace.left && !blocked.right) {
+        data.move = 'right';
+      }
+      if (openSpace.left > openSpace.right && !blocked.left) {
+        data.move = 'left';
+      } else {
+        data.move = 'down';
+      }
       console.log("Doublecheck: right");
     }
     if (data.move === 'right' && blocked.right) {
-      data.move = 'down';
+      if (openSpace.up > openSpace.down && !blocked.up) {
+        data.move = 'up';
+      }
+      if (openSpace.down > openSpace.up && !blocked.down) {
+        data.move = 'down';
+      } else {
+        data.move = 'left';
+      }
       console.log("Doublecheck: down");
     }
     if (data.move === 'down' && blocked.down) {
-      data.move = 'left';
+      if (openSpace.left > openSpace.right && !blocked.left) {
+        data.move = 'left';
+      }
+      if (openSpace.right > openSpace.left && !blocked.right) {
+        data.move = 'right';
+      } else {
+        data.move = 'up';
+      }
       console.log("Doublecheck: left");
     }
     if (data.move === 'left' && blocked.left) {
-      data.move = 'up';
+      if (openSpace.up > openSpace.down && !blocked.up) {
+        data.move = 'up';
+      }
+      if (openSpace.down > openSpace.up && !blocked.down) {
+        data.move = 'down';
+      } else {
+        data.move = 'right';
+      }
       console.log("Doublecheck: up");
     }
     if (blocked.up && checkCounter === 0 && data.move === 'up') {
